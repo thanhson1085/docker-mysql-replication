@@ -1,0 +1,32 @@
+version: "2"
+
+services:
+  db:
+    image: docker-mysql-replication:5.7
+    build: ./5.7/
+    container_name: db
+    env_file: db.env
+    volumes:
+      - "db:/var/lib/mysql"
+    environment:
+      - "constraint:node==b125"
+    networks:
+      - back-tier
+
+  db_slave:
+    image: docker-mysql-replication:5.7
+    build: ./5.7
+    container_name: db_slave
+    env_file: db_slave.env
+    depends_on:
+      - db
+    volumes:
+      - "db_slave:/var/lib/mysql"
+    networks:
+      - back-tier
+
+volumes:
+    db:
+    db_slave:
+networks:
+  back-tier:
