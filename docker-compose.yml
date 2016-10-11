@@ -18,6 +18,8 @@ services:
     env_file: db_slave.env
     depends_on:
       - db
+    volumes:
+      - "db_slave:/var/lib/mysql"
     networks:
       - back-tier
 

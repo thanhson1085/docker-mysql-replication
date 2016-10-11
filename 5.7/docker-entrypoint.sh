@@ -171,6 +171,11 @@ if [ "$1" = 'mysqld' -a -z "$wantHelp" ]; then
                 if [ ! -f /tmp/replication_set.2 ]; then
                     echo "=> Setting master connection info on slave"
                     mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "stop slave"
+                    until mysql -h${MYSQL_PORT_3306_TCP_ADDR} -P${MYSQL_PORT_3306_TCP_PORT} -u${MYSQL_ENV_REPLICATION_USER} -p${MYSQL_ENV_REPLICATION_PASS} -e "status" 2> /dev/null; do
+                        echo "=> MYSQL MASTER is unavailable - sleeping"
+                        sleep 1
+                    done
+                    echo "=> MYSQL MASTER status is OK!!!"
                     mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "CHANGE MASTER TO MASTER_HOST='${MYSQL_PORT_3306_TCP_ADDR}',MASTER_USER='${MYSQL_ENV_REPLICATION_USER}',MASTER_PASSWORD='${MYSQL_ENV_REPLICATION_PASS}',MASTER_PORT=${MYSQL_PORT_3306_TCP_PORT}, MASTER_CONNECT_RETRY=30"
                     mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "start slave"
                     echo "=> Done!"
